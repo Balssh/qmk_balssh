@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "keycodes.h"
 #include QMK_KEYBOARD_H
 
 enum layers {
@@ -54,11 +55,11 @@ enum layers {
 // Defining the layers
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [BASE] = LAYOUT_split_3x6_3(
+    [BASE] = LAYOUT_split_3x6_3_ex2(
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        XXXXXXX,    KC_B,    KC_L,    KC_D,    KC_W,    KC_Z,                         KC_J,    KC_F,    KC_O,    KC_U,   KC_QUOT,  XXXXXXX,
+        XXXXXXX,    KC_B,    KC_L,    KC_D,    KC_W,    KC_Z, XXXXXXX,                         XXXXXXX, KC_J,    KC_F,    KC_O,    KC_U,   KC_QUOT,  XXXXXXX,
         //|-------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--+-----|
-        XXXXXXX,    HRM_N,   HRM_R,   HRM_T,   HRM_S,   KC_G,                         KC_Y,    HRM_H,   HRM_A,   HRM_E,  HRM_I,    XXXXXXX,
+        XXXXXXX,    HRM_N,   HRM_R,   HRM_T,   HRM_S,   KC_G, XXXXXXX,                         XXXXXXX, KC_Y,    HRM_H,   HRM_A,   HRM_E,  HRM_I,    XXXXXXX,
         //|-------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--+-----|
         XXXXXXX,    KC_Q,    KC_X,    KC_M,    KC_C,    KC_V,                         KC_K,    KC_P,    KC_COMM, KC_DOT, KC_SLSH,  XXXXXXX,
         //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
