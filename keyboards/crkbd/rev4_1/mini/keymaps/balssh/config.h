@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define QUICK_TAP_TERM 0
 #define TAPPING_TERM 175
 #define BOTH_SHIFTS_TURNS_ON_CAPS_WORD
+#define CHORDAL_HOLD
+#define PERMISSIVE_HOLD
 
 #ifdef RGBLIGHT_ENABLE
 #define RGBLIGHT_EFFECT_BREATHING
