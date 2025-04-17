@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "keycodes.h"
+#include "custom_shift_keys.h"
 #include "keymap_us.h"
 #include QMK_KEYBOARD_H
 
@@ -29,7 +29,27 @@ enum layers {
     NUM,
     FUN,
 };
-
+enum custom_keycodes {
+    ARROW = SAFE_RANGE,
+    SRCHSEL,
+    RGBNEXT,
+    RGBHUP,
+    RGBHRND,
+    // Macros invoked through the Magic key.
+    M_DOCSTR,
+    M_EQEQ,
+    M_INCLUDE,
+    M_ION,
+    M_MENT,
+    M_MKGRVS,
+    M_QUEN,
+    M_THE,
+    M_TMENT,
+    M_UPDIR,
+    M_NBSP,
+    M_NOOP,
+};
+const custom_shift_key_t custom_shift_keys[] = {};
 // The "magic" key is the Alternate Repeat Key.
 #define MAGIC QK_AREP
 // F20 mutes the mic on my system.
@@ -70,14 +90,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [MED] = LAYOUT_split_3x6_3_ex2(
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,              XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,              XXXXXXX, LUMINO, KC_MPLY, KC_MPRV, KC_MNXT, XXXXXXX, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,              XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,              XXXXXXX, RGBHRND, KC_MUTE, KC_VOLD, KC_VOLU, XXXXXXX, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                RGBNEXT, RGBHUP, KC_BRID, KC_BRIU, XXXXXXX, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-        KC_LGUI, XXXXXXX,  KC_SPC,     KC_ENT, XXXXXXX,   QK_LLCK
-        //`--------------------------'  `--------------------------'
+                                            KC_LGUI, XXXXXXX,  KC_SPC,     KC_ENT, XXXXXXX,   QK_LLCK
+                                            //`--------------------------'  `--------------------------'
     ),
 
     [NAV] = LAYOUT_split_3x6_3_ex2(
@@ -108,7 +128,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
         XXXXXXX, KC_GRV, KC_LBRC, KC_RBRC, KC_EXLM, KC_BSLS, XXXXXXX,               XXXXXXX, XXXXXXX, KC_CIRC, KC_DLR, KC_PERC, XXXXXXX, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        XXXXXXX, KC_ASTR, KC_LPRN, KC_RPRN, KC_AT, KC_EQL, XXXXXXX,               XXXXXXX, XXXXXXX, KC_LSFT, KC_QUOT, KC_DQT, KC_LGUI,  XXXXXXX,
+        XXXXXXX, KC_ASTR, KC_LPRN, KC_RPRN, KC_AT, KC_EQL, XXXXXXX,               XXXXXXX, XXXXXXX, KC_LSFT, KC_QUOT, KC_DQT, XXXXXXX,  XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
         XXXXXXX, KC_SLASH, KC_LT, KC_GT, KC_HASH, KC_AMPR,                                  XXXXXXX, KC_SCLN, KC_COMM, KC_DOT, KC_COLN, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
@@ -161,35 +181,143 @@ const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
 #endif  // CHORDAL_HOLD
 // clang-format on
 
-#ifdef ENCODER_MAP_ENABLE
-const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [0] =
-        {
-            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
-            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
-            ENCODER_CCW_CW(RM_VALD, RM_VALU),
-            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
-        },
-    [1] =
-        {
-            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
-            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
-            ENCODER_CCW_CW(RM_VALD, RM_VALU),
-            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
-        },
-    [2] =
-        {
-            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
-            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
-            ENCODER_CCW_CW(RM_VALD, RM_VALU),
-            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
-        },
-    [3] =
-        {
-            ENCODER_CCW_CW(KC_VOLD, KC_VOLU),
-            ENCODER_CCW_CW(KC_MPRV, KC_MNXT),
-            ENCODER_CCW_CW(RM_VALD, RM_VALU),
-            ENCODER_CCW_CW(KC_RGHT, KC_LEFT),
-        },
-};
+// A cheap pseudorandom generator.
+static uint8_t myrand(void) {
+    static uint16_t state = 1;
+#ifdef __CHIBIOS__ // Use high-res timer on ChibiOS.
+    state += (uint16_t)chVTGetSystemTimeX();
+#else
+    state += timer_read();
 #endif
+    state *= UINT16_C(36563);
+    return state >> 8;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// RGB Matrix Lighting (https://docs.qmk.fm/features/rgb_matrix)
+///////////////////////////////////////////////////////////////////////////////
+#if RGB_MATRIX_ENABLE
+static void lighting_set_palette(uint8_t palette) {
+    if (lumino_get_value() == 0) {
+        lumino_cycle_3_state();
+    }
+    rgb_matrix_enable_noeeprom();
+    rgb_matrix_sethsv_noeeprom(RGB_MATRIX_HUE_STEP * palette, 255, rgb_matrix_get_val());
+}
+
+#endif // RGB_MATRIX_ENABLE
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+    const uint8_t mods       = get_mods();
+    const uint8_t all_mods   = (mods | get_weak_mods());
+    const uint8_t shift_mods = all_mods & MOD_MASK_SHIFT;
+
+    if (record->event.pressed) {
+        switch (keycode) {
+                // case UPDIR:
+                //   SEND_STRING_DELAY("../", TAP_CODE_DELAY);
+                //   return false;
+
+                // case STDCC:
+                //   SEND_STRING_DELAY("std::", TAP_CODE_DELAY);
+                //   return false;
+
+                // case ARROW:  // Unicode arrows -> => <-> <=> through Shift and Alt.
+                //   send_unicode_string(alt ? (shift_mods
+                //                               ? "\xe2\x87\x94"     // <=>
+                //                               : "\xe2\x86\x94")    // <->
+                //                            : (shift_mods
+                //                               ? "\xe2\x87\x92"     // =>
+                //                               : "\xe2\x86\x92"));  // ->
+                //   return false;
+
+            case KC_RABK:
+                if (shift_mods) { // Shift + > types a happy emoji.
+                    static const char* emojis[] = {
+                        "\xf0\x9f\xa5\xb3", // Party hat.
+                        "\xf0\x9f\x91\x8d", // Thumbs up.
+                        "\xe2\x9c\x8c",     // Victory hand.
+                        "\xf0\x9f\xa4\xa9", // Star eyes.
+                        "\xf0\x9f\x94\xa5", // Fire.
+                        "\xf0\x9f\x8e\x89", // Party popper.
+                        "\xf0\x9f\x91\xbe", // Purple alien.
+                        "\xf0\x9f\x98\x81", // Grin.
+                    };
+                    const int NUM_EMOJIS = sizeof(emojis) / sizeof(*emojis);
+
+                    // Pick an index between 0 and NUM_EMOJIS - 2.
+                    uint8_t index = ((NUM_EMOJIS - 1) * myrand()) >> 8;
+                    // Don't pick the same emoji twice in a row.
+                    static uint8_t last_index = 0;
+                    if (index >= last_index) {
+                        ++index;
+                    }
+                    last_index = index;
+
+                    // Produce the emoji.
+                    send_unicode_string(emojis[index]);
+                    return false;
+                }
+                return true;
+
+                // Macros invoked through the MAGIC key.
+                // case M_THE:
+                //     MAGIC_STRING(/* */ "the", KC_N);
+                //     break;
+                // case M_ION:
+                //     MAGIC_STRING(/*i*/ "on", KC_S);
+                //     break;
+                // case M_MENT:
+                //     MAGIC_STRING(/*m*/ "ent", KC_S);
+                //     break;
+                // case M_QUEN:
+                //     MAGIC_STRING(/*q*/ "uen", KC_C);
+                //     break;
+                // case M_TMENT:
+                //     MAGIC_STRING(/*t*/ "ment", KC_S);
+                //     break;
+                // case M_UPDIR:
+                //     MAGIC_STRING(/*.*/ "./", UPDIR);
+                //     break;
+                // case M_INCLUDE:
+                //     SEND_STRING_DELAY(/*#*/ "include ", TAP_CODE_DELAY);
+                //     break;
+                // case M_EQEQ:
+                //     SEND_STRING_DELAY(/*=*/"==", TAP_CODE_DELAY);
+                //     break;
+                // case M_NBSP:
+                //     SEND_STRING_DELAY(/*&*/ "nbsp;", TAP_CODE_DELAY);
+                //     break;
+                //
+                // case M_DOCSTR:
+                //     SEND_STRING_DELAY(/*"*/ "\"\"\"\"\"" SS_TAP(X_LEFT) SS_TAP(X_LEFT) SS_TAP(X_LEFT), TAP_CODE_DELAY);
+                //     break;
+                // case M_MKGRVS:
+                //     SEND_STRING_DELAY(/*`*/ "``\n\n```" SS_TAP(X_UP), TAP_CODE_DELAY);
+                //     break;
+
+#if RGB_MATRIX_ENABLE
+            case RGBNEXT:
+                if (shift_mods) {
+                    rgb_matrix_step_reverse_noeeprom();
+                } else {
+                    rgb_matrix_step_noeeprom();
+                }
+                break;
+
+            case RGBHUP:
+                if (shift_mods) {
+                    rgb_matrix_decrease_hue_noeeprom();
+                } else {
+                    rgb_matrix_increase_hue_noeeprom();
+                }
+                break;
+
+            case RGBHRND:
+                lighting_set_palette(myrand());
+                break;
+#endif // RGB_MATRIX_ENABLE
+        }
+    }
+
+    return true;
+}
