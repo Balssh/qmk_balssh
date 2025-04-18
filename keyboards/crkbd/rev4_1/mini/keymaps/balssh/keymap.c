@@ -17,7 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "custom_shift_keys.h"
+#include "keycodes.h"
 #include "keymap_us.h"
+#include "quantum_keycodes.h"
 #include QMK_KEYBOARD_H
 
 enum layers {
@@ -102,7 +104,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [NAV] = LAYOUT_split_3x6_3_ex2(
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,         XXXXXXX, XXXXXXX,  C(KC_H), C(KC_K), C(KC_J), C(KC_L), XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                      |--------+--------+--------+--------+--------+-------|
         XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,         XXXXXXX, XXXXXXX, KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+-------|
@@ -138,11 +140,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [NUM] = LAYOUT_split_3x6_3_ex2(
         //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        XXXXXXX, KC_PERC,  KC_7, KC_8,  KC_9, KC_PPLS,  XXXXXXX,                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, KC_PERC,  KC_7, KC_8,  KC_9, KC_PPLS,  XXXXXXX,                    XXXXXXX, XXXXXXX, KC_DOWN, KC_UP, XXXXXXX, XXXXXXX, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        XXXXXXX, KC_ASTR, KC_4, KC_5, KC_6, KC_PEQL, XXXXXXX      ,                 XXXXXXX, XXXXXXX, KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, KC_ASTR, KC_4, KC_5, KC_6, KC_PEQL, XXXXXXX      ,                 XXXXXXX, XXXXXXX, KC_LSFT, KC_RCTL, KC_RALT, KC_RGUI, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-        XXXXXXX, KC_SLSH, KC_1, KC_2, KC_3, KC_PMNS,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, KC_SLSH, KC_1, KC_2, KC_3, KC_PMNS,                                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                             QK_LLCK,   KC_0,  KC_SPC,           XXXXXXX, XXXXXXX, XXXXXXX
                                             //`--------------------------'  `--------------------------'
@@ -205,7 +207,29 @@ static void lighting_set_palette(uint8_t palette) {
     rgb_matrix_sethsv_noeeprom(RGB_MATRIX_HUE_STEP * palette, 255, rgb_matrix_get_val());
 }
 
+static void lighting_preset(uint8_t effect, uint8_t palette) {
+    lighting_set_palette(palette);
+    rgb_matrix_mode_noeeprom(effect);
+    rgb_matrix_set_speed_noeeprom(100);
+}
 #endif // RGB_MATRIX_ENABLE
+
+void keyboard_post_init_user(void) {
+#if RGB_MATRIX_ENABLE
+    lighting_preset(RGB_MATRIX_CUSTOM_PALETTEFX_FLOW + (myrand() % 4), myrand());
+#endif // RGB_MATRIX_ENABLE
+
+    // Play MUSHROOM_SOUND two seconds after init, if defined and audio enabled.
+#if defined(AUDIO_ENABLE) && defined(MUSHROOM_SOUND)
+    uint32_t play_init_song_callback(uint32_t trigger_time, void* cb_arg) {
+        static float init_song[][2] = SONG(MUSHROOM_SOUND);
+        PLAY_SONG(init_song);
+        return 0;
+    }
+    defer_exec(2000, play_init_song_callback, NULL);
+#endif // defined(AUDIO_ENABLE) && defined(MUSHROOM_SOUND)
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     const uint8_t mods       = get_mods();
     const uint8_t all_mods   = (mods | get_weak_mods());
