@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycodes.h"
 #include "keymap_us.h"
 #include "quantum_keycodes.h"
+#include "lumino.h"
 #include QMK_KEYBOARD_H
 
 enum layers {
@@ -221,7 +222,7 @@ void keyboard_post_init_user(void) {
 
     // Play MUSHROOM_SOUND two seconds after init, if defined and audio enabled.
 #if defined(AUDIO_ENABLE) && defined(MUSHROOM_SOUND)
-    uint32_t play_init_song_callback(uint32_t trigger_time, void* cb_arg) {
+    uint32_t play_init_song_callback(uint32_t trigger_time, void *cb_arg) {
         static float init_song[][2] = SONG(MUSHROOM_SOUND);
         PLAY_SONG(init_song);
         return 0;
