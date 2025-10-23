@@ -230,7 +230,7 @@ void keyboard_post_init_user(void) {
 #endif // defined(AUDIO_ENABLE) && defined(MUSHROOM_SOUND)
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     const uint8_t mods       = get_mods();
     const uint8_t all_mods   = (mods | get_weak_mods());
     const uint8_t shift_mods = all_mods & MOD_MASK_SHIFT;
@@ -256,7 +256,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 
             case KC_RABK:
                 if (shift_mods) { // Shift + > types a happy emoji.
-                    static const char* emojis[] = {
+                    static const char *emojis[] = {
                         "\xf0\x9f\xa5\xb3", // Party hat.
                         "\xf0\x9f\x91\x8d", // Thumbs up.
                         "\xe2\x9c\x8c",     // Victory hand.
