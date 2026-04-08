@@ -1,10 +1,11 @@
 COMBO_ENABLE = yes
 LTO_ENABLE = yes
 REPEAT_KEY_ENABLE = yes
-UNICODE_COMMON = yes
-TAP_DANCE_ENABLE = yes
+TRI_LAYER_ENABLE = yes
 
 CAPS_WORD_ENABLE ?= yes
 LAYER_LOCK_ENABLE ?= yes
-NKRO_ENABLE ?= no
+NKRO_ENABLE ?= yes
+TAP_DANCE_ENABLE ?= yes
 
+SRC += oneshot.c swapper.c
