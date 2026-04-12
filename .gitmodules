@@ -1,3 +1,6 @@
 [submodule "modules/getreuer"]
 	path = modules/getreuer
 	url = https://github.com/getreuer/qmk-modules.git
+[submodule "modules/balssh/smart_layers"]
+	path = modules/balssh/smart_layers
+	url = https://github.com/Balssh/qmk-modules
