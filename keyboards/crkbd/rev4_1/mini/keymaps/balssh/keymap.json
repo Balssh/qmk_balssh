@@ -4,6 +4,8 @@
     "getreuer/palettefx",
     "getreuer/select_word",
     "getreuer/sentence_case",
-    "getreuer/orbital_mouse"
+    "getreuer/orbital_mouse",
+    "getreuer/custom_shift_keys",
+    "balssh/smart_layers"
   ]
 }
