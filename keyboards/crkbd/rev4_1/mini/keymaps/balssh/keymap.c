@@ -8,6 +8,7 @@
 #include "orbital_mouse.h"
 #include "process_combo.h"
 #include "smart_layers.h"
+#include "swapper.h"
 
 #include QMK_KEYBOARD_H
 
@@ -20,6 +21,13 @@ enum {
     DOT_CLN,
     COMM_SCLN,
     SLSH_BSLSH,
+    NAV_LEFT_TD,
+    NAV_RIGHT_TD,
+    NAV_UP_TD,
+    NAV_DOWN_TD,
+    NAV_BSPC_TD,
+    NAV_DEL_TD,
+    SMART_NUM_TD,
 };
 
 enum layers {
@@ -39,6 +47,7 @@ enum custom_keycodes {
     RGBHRND,
     NUMWORD,
     SMARTMOUSE,
+    SW_WIN,
 };
 
 enum keycode_aliases {
@@ -62,6 +71,13 @@ enum keycode_aliases {
     LT_NAV  = LT(_NAV, KC_ESC),
     LT_MOUS = LT(_MOUS, KC_SPC),
     LT_SYM  = LT(_SYM, KC_ENT),
+
+    NAV_LEFT  = TD(NAV_LEFT_TD),
+    NAV_RIGHT = TD(NAV_RIGHT_TD),
+    NAV_UP    = TD(NAV_UP_TD),
+    NAV_DOWN  = TD(NAV_DOWN_TD),
+    NAV_BSPC  = TD(NAV_BSPC_TD),
+    NAV_DEL   = TD(NAV_DEL_TD),
 };
 
 const smart_layer_t smart_layers[] = {
@@ -93,7 +109,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_Q,   KC_X,    KC_M,    KC_C,    KC_V,                KC_K,   KC_P,   TD(COMM_SCLN),    TD(DOT_CLN), TD(SLSH_BSLSH),
                          LT_FUN,  LT_NAV,  LT_MOUS,             KC_ENT, KC_BSPC, KC_DEL
     ),
-
     [_NUM] = LAYOUT_split_3x5_3_ex2(
         __, KC_PLUS, KC_ASTR, __, __, __,   __, __, __, KC_SLSH, KC_MINS, __,
         KC_6, KC_4, KC_0, KC_2, __, __,     __, __, KC_3, KC_1, KC_5, KC_7,
@@ -102,10 +117,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_NAV] = LAYOUT_split_3x5_3_ex2(
-        __, __, __, __, __, __,         __, __,  C(KC_H), C(KC_K), C(KC_J), C(KC_L),
-        __, __, __, __, __, __,         __, __, KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT,
-        __, __, __, __, __,                 __, KC_HOME, KC_PGDN, KC_PGUP, KC_END,
-                __, __,  KC_SPC,        KC_ENT, KC_BSPC, KC_DEL
+        __, LSFT(KC_TAB), SW_WIN, __, __, __,                     __, __,  C(KC_H), C(KC_K), C(KC_J), C(KC_L),
+        OSM(MOD_LGUI), OSM(MOD_LALT), OSM(MOD_LCTL), OSM(MOD_LSFT), __, __,  __, __, NAV_LEFT, NAV_DOWN, NAV_UP, NAV_RIGHT,
+        __, __, __, __, __,                                              __, KC_HOME, KC_PGDN, KC_PGUP, KC_END,
+                __, __,  __,                                         KC_ENT, NAV_BSPC, NAV_DEL
     ),
 
     [_MOUS] = LAYOUT_split_3x5_3_ex2(
@@ -117,7 +132,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_FUN] = LAYOUT_split_3x5_3_ex2(
         KC_F12, KC_F7, KC_F8, KC_F9, KC_PSCR, __,       __, LUMINO, KC_MPLY, KC_MPRV, KC_MNXT, __,
-        KC_F11, KC_F4, KC_F5, KC_F6, KC_WBAK, __,       __, RGBHRND, KC_MUTE, KC_VOLD, KC_VOLU, __,
+        LGUI_T(KC_F11), LALT_T(KC_F4), LCTL_T(KC_F5), LSFT_T(KC_F6), KC_WBAK, __,       __, RGBHRND, KC_MUTE, KC_VOLD, KC_VOLU, __,
         KC_F10, KC_F1, KC_F2, KC_F3, KC_WFWD,               RGBNEXT, RGBHUP, KC_BRID, KC_BRIU, __,
                        __, __, __,                    __, __, QK_LLCK
     ),
@@ -177,8 +192,8 @@ combo_t key_combos[] = {
     COMBO(combo_grv,    KC_GRV),
     COMBO(combo_eq,     KC_EQL),
     COMBO(combo_tild,   KC_TILD),
-    COMBO(combo_paste,  C(KC_V)),
-    COMBO(combo_copy,   C(KC_C)),
+    COMBO(combo_paste,  KC_PASTE),
+    COMBO(combo_copy,   KC_COPY),
     // Right hand
     COMBO(combo_bspc,   KC_BSPC),
     COMBO(combo_del,    KC_DEL),
@@ -195,7 +210,7 @@ combo_t key_combos[] = {
     COMBO(combo_lbrc,   KC_LBRC),
     COMBO(combo_rbrc,   KC_RBRC),
     // Misc
-    COMBO(combo_numword, NUMWORD),
+    COMBO(combo_numword, TD(SMART_NUM_TD)),
 };
 // clang-format on
 #ifdef CHORDAL_HOLD
@@ -262,11 +277,40 @@ void tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
         .user_data = (void *)&((tap_dance_tap_hold_t){tap, hold, 0}),               \
     }
 
+static bool smart_num_held    = false;
+static bool oneshot_num       = false;
+static bool oneshot_num_used  = false;
+
+void smart_num_finished(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 2) {
+        // Double-tap → one-shot num layer
+        oneshot_num      = true;
+        oneshot_num_used = false;
+        layer_on(_NUM);
+    } else {
+        // Tap → numword (smart layer toggle)
+        enable_smart_layer(0);
+    }
+}
+
+void smart_num_reset(tap_dance_state_t *state, void *user_data) {
+    smart_num_held = false;
+}
+
+// clang-format off
 tap_dance_action_t tap_dance_actions[] = {
-    [DOT_CLN]    = ACTION_TAP_DANCE_TAP_HOLD(KC_DOT, KC_COLN),
-    [COMM_SCLN]  = ACTION_TAP_DANCE_TAP_HOLD(KC_COMMA, KC_SCLN),
+    [DOT_CLN] = ACTION_TAP_DANCE_TAP_HOLD(KC_DOT, KC_COLN),
+    [COMM_SCLN] = ACTION_TAP_DANCE_TAP_HOLD(KC_COMMA, KC_SCLN),
     [SLSH_BSLSH] = ACTION_TAP_DANCE_TAP_HOLD(KC_SLSH, KC_BSLS),
+    [NAV_LEFT_TD] = ACTION_TAP_DANCE_TAP_HOLD(KC_LEFT, KC_HOME),
+    [NAV_RIGHT_TD] = ACTION_TAP_DANCE_TAP_HOLD(KC_RIGHT, KC_END),
+    [NAV_UP_TD] = ACTION_TAP_DANCE_TAP_HOLD(KC_UP, C(KC_HOME)),
+    [NAV_DOWN_TD] = ACTION_TAP_DANCE_TAP_HOLD(KC_DOWN, C(KC_END)),
+    [NAV_BSPC_TD] = ACTION_TAP_DANCE_TAP_HOLD(KC_BSPC, C(KC_BSPC)),
+    [NAV_DEL_TD] = ACTION_TAP_DANCE_TAP_HOLD(KC_DEL, C(KC_DEL)),
+    [SMART_NUM_TD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, smart_num_finished, smart_num_reset),
 };
+// clang-format on
 
 ///////////////////////////////////////////////////////////////////////////////
 // RGB Matrix Lighting (https://docs.qmk.fm/features/rgb_matrix)
@@ -310,7 +354,25 @@ void smart_layer_set_user(uint8_t layer, bool active) {
 }
 #endif
 
+static bool sw_win_active = false;
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    update_swapper(&sw_win_active, KC_LALT, KC_TAB, SW_WIN, LSFT(KC_TAB), keycode, record);
+    if (sw_win_active && keycode == SW_WIN) return false;
+
+    // Manual one-shot for _NUM: turn off after next non-modifier key press+release
+    if (oneshot_num && keycode != TD(SMART_NUM_TD)) {
+        bool is_mod = (keycode >= KC_LCTL && keycode <= KC_RGUI);
+        if (!is_mod) {
+            if (record->event.pressed) {
+                oneshot_num_used = true;
+            } else if (oneshot_num_used) {
+                layer_off(_NUM);
+                oneshot_num      = false;
+                oneshot_num_used = false;
+            }
+        }
+    }
     const uint8_t mods       = get_mods();
     const uint8_t all_mods   = (mods | get_weak_mods());
     const uint8_t shift_mods = all_mods & MOD_MASK_SHIFT;
@@ -319,7 +381,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case TD(DOT_CLN):
         case TD(COMM_SCLN):
-        case TD(SLSH_BSLSH): {
+        case TD(SLSH_BSLSH):
+        case TD(NAV_LEFT_TD):
+        case TD(NAV_RIGHT_TD):
+        case TD(NAV_UP_TD):
+        case TD(NAV_DOWN_TD):
+        case TD(NAV_BSPC_TD):
+        case TD(NAV_DEL_TD): {
             tap_dance_action_t *action = tap_dance_get(QK_TAP_DANCE_GET_INDEX(keycode));
             tap_dance_state_t  *state  = tap_dance_get_state(QK_TAP_DANCE_GET_INDEX(keycode));
             if (!record->event.pressed && state != NULL && state->count && !state->finished) {

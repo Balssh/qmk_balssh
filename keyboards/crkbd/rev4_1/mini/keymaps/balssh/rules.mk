@@ -8,3 +8,5 @@ CAPS_WORD_ENABLE ?= yes
 LAYER_LOCK_ENABLE ?= yes
 NKRO_ENABLE ?= no
 
+SRC += swapper.c
+
