@@ -1,3 +1,5 @@
+#include <stdint.h>
+#include "color.h"
 #include "keymap_introspection.h"
 #include "custom_shift_keys.h"
 #include "keycodes.h"
@@ -36,6 +38,7 @@ enum custom_keycodes {
     RGBHUP,
     RGBHRND,
     NUMWORD,
+    SMARTMOUSE,
 };
 
 enum keycode_aliases {
@@ -59,12 +62,11 @@ enum keycode_aliases {
     LT_NAV  = LT(_NAV, KC_ESC),
     LT_MOUS = LT(_MOUS, KC_SPC),
     LT_SYM  = LT(_SYM, KC_ENT),
-    // NUMWORD = LT(_NUM, KC_BSPC),
-    // LT_FUN  = LT(_FUN, KC_DEL),
 };
 
 const smart_layer_t smart_layers[] = {
     {NUMWORD, _NUM},
+    {SMARTMOUSE, _MOUS},
 };
 
 // clang-format off
@@ -76,6 +78,11 @@ SMART_LAYER_ALLOW(_NUM,
         KC_MINS, KC_ASTR, KC_PLUS, KC_COLN,
         KC_EQL, KC_UNDS, KC_BSPC, KC_X,
         MAGIC, KC_ENT
+    ),
+SMART_LAYER_ALLOW(_MOUS,
+        OM_L, OM_D, OM_U, OM_R,
+        MS_WHLD, MS_WHLU,
+        MS_BTN2, MS_BTN1, MS_BTN3
     ),
 };
 
@@ -105,7 +112,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         __, __, __, __, __, __,         __, __, __, __, __, __,
         __, __, __, __, __, __,         __, __, OM_L, OM_D, OM_U, OM_R,
         __, __, __, __, __,                 __, __, MS_WHLD, MS_WHLU, __,
-                __, __,  KC_SPC,       MS_BTN2, MS_BTN1, MS_BTN3
+                __, __,  __,       MS_BTN2, MS_BTN1, MS_BTN3
     ),
 
     [_FUN] = LAYOUT_split_3x5_3_ex2(
@@ -116,70 +123,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 // clang-format on
-//
-// static bool _num_word_enabled = false;
-// bool        num_word_enabled(void) {
-//     return _num_word_enabled;
-// }
-// void enable_num_word(void) {
-//     if (!_num_word_enabled) {
-//         _num_word_enabled = true;
-//     }
-//     layer_on(_NUM);
-// }
-// void disable_num_word(void) {
-//     _num_word_enabled = false;
-//     layer_off(_NUM);
-// }
-// void process_num_word_activation(const keyrecord_t *record) {
-//     if (!record->event.pressed) {
-//         return;
-//     }
-//
-//     if (num_word_enabled()) {
-//         _num_word_enabled = false;
-//     } else {
-//         enable_num_word();
-//     }
-// }
-//
-// bool process_num_word(uint16_t keycode, const keyrecord_t *record) {
-//     if (!_num_word_enabled) return true;
-//
-//     switch (keycode) {
-//         case QK_MOD_TAP ... QK_MOD_TAP_MAX:
-//         case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
-//         case QK_TAP_DANCE ... QK_TAP_DANCE_MAX:
-//             if (record->tap.count == 0) return true;
-//             keycode = keycode & 0xFF;
-//     }
-//     switch (keycode) {
-//         case KC_1 ... KC_0:
-//         case KC_PERC:
-//         case KC_COMM:
-//         case KC_DOT:
-//         case KC_SLSH:
-//         case KC_MINS:
-//         case KC_ASTR:
-//         case KC_PLUS:
-//         case KC_COLN:
-//         case KC_EQL:
-//         case KC_UNDS:
-//         case KC_BSPC:
-//         case KC_X:
-//         case MAGIC:
-//         case KC_ENT:
-//             break;
-//         case KC_SPC:
-//             tap_code(KC_SPC);
-//             disable_num_word();
-//         default:
-//             if (record->event.pressed) {
-//                 disable_num_word();
-//             }
-//     }
-//     return true;
-// }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Combos (https://docs.qmk.fm/features/combo)
@@ -223,7 +166,7 @@ const uint16_t combo_numword[] PROGMEM = {KC_Q, TD(SLSH_BSLSH), COMBO_END};
 combo_t key_combos[] = {
     // Left hand
     COMBO(combo_esc,    LT_NAV),
-    COMBO(combo_mouse,  LT_MOUS),
+    COMBO(combo_mouse,  SMARTMOUSE),
     COMBO(combo_hash,   KC_HASH),
     COMBO(combo_at,     KC_AT),
     COMBO(combo_dlr,    KC_DLR),
@@ -349,24 +292,25 @@ void keyboard_post_init_user(void) {
     lighting_preset(RGB_MATRIX_CUSTOM_PALETTEFX_FLOW + (myrand() % 4), myrand());
 #endif // RGB_MATRIX_ENABLE
 }
-void smart_layer_set_user(uint8_t layer, bool active) {
-    if (layer == _NUM) {
+
 #if RGB_MATRIX_ENABLE
-        if (active) {
-            rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+void smart_layer_set_user(uint8_t layer, bool active) {
+    if (active) {
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+        if (layer == _NUM) {
+            // Cyan for number word mode
             rgb_matrix_sethsv_noeeprom(HSV_CYAN);
-        } else {
-            lighting_preset(RGB_MATRIX_CUSTOM_PALETTEFX_FLOW + (myrand() % 4), myrand());
+        } else if (layer == _MOUS) {
+            // Magenta for smart mouse mode
+            rgb_matrix_sethsv_noeeprom(HSV_MAGENTA);
         }
-#endif
+    } else {
+        lighting_preset(RGB_MATRIX_CUSTOM_PALETTEFX_FLOW + (myrand() % 4), myrand());
     }
 }
+#endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    // if (!process_num_word(keycode, record)) {
-    //     return false;
-    // }
-
     const uint8_t mods       = get_mods();
     const uint8_t all_mods   = (mods | get_weak_mods());
     const uint8_t shift_mods = all_mods & MOD_MASK_SHIFT;
@@ -375,7 +319,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case TD(DOT_CLN):
         case TD(COMM_SCLN):
-        case TD(SLSH_BSLSH):
+        case TD(SLSH_BSLSH): {
             tap_dance_action_t *action = tap_dance_get(QK_TAP_DANCE_GET_INDEX(keycode));
             tap_dance_state_t  *state  = tap_dance_get_state(QK_TAP_DANCE_GET_INDEX(keycode));
             if (!record->event.pressed && state != NULL && state->count && !state->finished) {
@@ -383,6 +327,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 tap_code16(tap_hold->tap);
             }
             break;
+        }
     }
 
     if (record->event.pressed) {
