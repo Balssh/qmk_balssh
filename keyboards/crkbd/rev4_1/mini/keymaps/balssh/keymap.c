@@ -103,38 +103,42 @@ SMART_LAYER_ALLOW(_MOUS,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    // Column widths (key + comma + spaces):
+    // L0=16  L1=15          L2=15          L3=15          L4=9     Lex=5 Rex=5 R0=9     R1=10      R2=15          R3=13         R4=last
+
     [_BASE] = LAYOUT_split_3x5_3_ex2(
-        KC_B,   KC_L,    KC_D,    KC_W,    KC_Z,   __,     __,  KC_J,   KC_F,   KC_O,       KC_U,   KC_QUOT,
-        HRM_N,  HRM_R,   HRM_T,   HRM_S,   KC_G,   __,     __,  KC_Y,   HRM_H,  HRM_A,      HRM_E,  HRM_I,
-        KC_Q,   KC_X,    KC_M,    KC_C,    KC_V,                KC_K,   KC_P,   TD(COMM_SCLN),    TD(DOT_CLN), TD(SLSH_BSLSH),
-                         LT_FUN,  LT_NAV,  LT_MOUS,             KC_ENT, KC_BSPC, KC_DEL
+        KC_B,           KC_L,          KC_D,          KC_W,          KC_Z,    __,  __,  KC_J,    KC_F,     KC_O,          KC_U,         KC_QUOT,
+        HRM_N,          HRM_R,         HRM_T,         HRM_S,         KC_G,    __,  __,  KC_Y,    HRM_H,    HRM_A,         HRM_E,        HRM_I,
+        KC_Q,           KC_X,          KC_M,          KC_C,          KC_V,              KC_K,    KC_P,     TD(COMM_SCLN), TD(DOT_CLN),  TD(SLSH_BSLSH),
+                                       LT_FUN,        LT_NAV,        LT_MOUS,           KC_ENT,  KC_BSPC,  KC_DEL
     ),
+
     [_NUM] = LAYOUT_split_3x5_3_ex2(
-        __, KC_PLUS, KC_ASTR, __, __, __,   __, __, __, KC_SLSH, KC_MINS, __,
-        KC_6, KC_4, KC_0, KC_2, __, __,     __, __, KC_3, KC_1, KC_5, KC_7,
-        __, __, __, KC_8, __,                   __, KC_9, __, __, __,
-                       __,  __,  KC_SPC,            ___, ___, ___
+        __,             KC_PLUS,       KC_ASTR,       __,            __,      __,  __,  __,      __,       KC_SLSH,       KC_MINS,      __,
+        KC_6,           KC_4,          KC_0,          KC_2,          __,      __,  __,  __,      KC_3,     KC_1,          KC_5,         KC_7,
+        __,             __,            __,            KC_8,          __,                __,      KC_9,     __,            __,           __,
+                                       __,            __,            KC_SPC,            ___,     ___,      ___
     ),
 
     [_NAV] = LAYOUT_split_3x5_3_ex2(
-        __, LSFT(KC_TAB), SW_WIN, __, __, __,                     __, __,  C(KC_H), C(KC_K), C(KC_J), C(KC_L),
-        OSM(MOD_LGUI), OSM(MOD_LALT), OSM(MOD_LCTL), OSM(MOD_LSFT), __, __,  __, __, NAV_LEFT, NAV_DOWN, NAV_UP, NAV_RIGHT,
-        __, __, __, __, __,                                              __, KC_HOME, KC_PGDN, KC_PGUP, KC_END,
-                __, __,  __,                                         KC_ENT, NAV_BSPC, NAV_DEL
+        __,             LSFT(KC_TAB),  SW_WIN,        __,            __,      __,  __,  __,      C(KC_H),  C(KC_K),       C(KC_J),      C(KC_L),
+        OSM(MOD_LGUI),  OSM(MOD_LALT), OSM(MOD_LCTL), OSM(MOD_LSFT), __,      __,  __,  __,      NAV_LEFT, NAV_DOWN,      NAV_UP,       NAV_RIGHT,
+        __,             __,            __,            __,            __,                __,      KC_HOME,  KC_PGDN,       KC_PGUP,      KC_END,
+                                       __,            __,            __,                KC_ENT,  NAV_BSPC, NAV_DEL
     ),
 
     [_MOUS] = LAYOUT_split_3x5_3_ex2(
-        __, __, __, __, __, __,         __, __, __, __, __, __,
-        __, __, __, __, __, __,         __, __, OM_L, OM_D, OM_U, OM_R,
-        __, __, __, __, __,                 __, __, MS_WHLD, MS_WHLU, __,
-                __, __,  __,       MS_BTN2, MS_BTN1, MS_BTN3
+        __,             __,            __,            __,            __,      __,  __,  __,      __,       __,            __,           __,
+        __,             __,            __,            __,            __,      __,  __,  __,      OM_L,     OM_D,          OM_U,         OM_R,
+        __,             __,            __,            __,            __,                __,      __,       MS_WHLD,       MS_WHLU,      __,
+                                       __,            __,            __,                MS_BTN2, MS_BTN1,  MS_BTN3
     ),
 
     [_FUN] = LAYOUT_split_3x5_3_ex2(
-        KC_F12, KC_F7, KC_F8, KC_F9, KC_PSCR, __,       __, LUMINO, KC_MPLY, KC_MPRV, KC_MNXT, __,
-        LGUI_T(KC_F11), LALT_T(KC_F4), LCTL_T(KC_F5), LSFT_T(KC_F6), KC_WBAK, __,       __, RGBHRND, KC_MUTE, KC_VOLD, KC_VOLU, __,
-        KC_F10, KC_F1, KC_F2, KC_F3, KC_WFWD,               RGBNEXT, RGBHUP, KC_BRID, KC_BRIU, __,
-                       __, __, __,                    __, __, QK_LLCK
+        KC_F12,         KC_F7,         KC_F8,         KC_F9,         KC_PSCR, __,  __,  LUMINO,  KC_MPLY,  KC_MPRV,       KC_MNXT,      __,
+        LGUI_T(KC_F11), LALT_T(KC_F4), LCTL_T(KC_F5), LSFT_T(KC_F6), KC_WBAK, __,  __,  RGBHRND, KC_MUTE,  KC_VOLD,       KC_VOLU,      __,
+        KC_F10,         KC_F1,         KC_F2,         KC_F3,         KC_WFWD,           RGBNEXT, RGBHUP,   KC_BRID,       KC_BRIU,      __,
+                                       __,            __,            __,                __,      __,       QK_LLCK
     ),
 };
 // clang-format on
